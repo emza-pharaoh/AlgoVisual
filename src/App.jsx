@@ -2,30 +2,52 @@ import { useState, useCallback } from 'react';
 import { ReactFlow, Background, Controls,  ReactFlowProvider, applyEdgeChanges, applyNodeChanges, addEdge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-const initialNodes = [
-  {
-    id: 'n1',
-    position: { x: 0, y: 0 },
-    data: { label: 'Node 1' },
-    type: 'input',
-  },
-  {
-    id: 'n2',
-    position: { x: 100, y: 100 },
-    data: { label: 'Node 2' },
-  },
-];
 
-const initialEdges = [
-  {
-    id: 'n1-n2',
-    source: 'n1',
-    target: 'n2',
-    type: 'step',
-    label: 'connects with',
-  },
-];
+//Depth First Search Implementation
+function dfs(nodes, edges, startId){
+  const visited = new Set();
+  const steps = [];
+  const adj = [];
 
+  edges.forEach(edge => {
+    adj[edge.source] ??= [];
+    adj[edge.target] ??= [];
+
+    adj[edge.source].push(edge.target);
+    adj[edge.target].push(edge.source);
+  })
+
+  
+
+  function dfsVisit(node){
+    if (visited.has(node)) return;
+    visited.add(node);
+  
+    //record node visit 
+    steps.push({
+      type: 'visit-node',
+      id: node,
+    });
+
+    for(const neighbor of adj[node] || []){
+      if(!visited.has(neighbor)){
+        steps.push({
+          type: 'visit-edge',
+          from: node,
+          to: neighbor,
+        });
+
+        dfsVisit(neighbor)
+      }
+    }
+    
+
+  }
+  
+  dfsVisit(startId);
+  return  steps;
+}
+ //Breathd First Search Implementation
 function bfs(nodes, edges, startId){
 
   //This funcion runs BFS, but instead of just visiting nodes, it records every step so you can animate it later.
@@ -40,7 +62,7 @@ function bfs(nodes, edges, startId){
     adj[edge.target] ??= [];
 
     adj[edge.source].push(edge.target);
-    adj[edge.target].push(edge.source)
+    adj[edge.target].push(edge.source);
   })
 
   const queue = [startId]
@@ -82,7 +104,7 @@ function bfs(nodes, edges, startId){
   }
   return steps
 }
-
+//animated Breadth First Search
 function animateBFS(steps, setNodes, setEdges){
   steps.forEach((step, index) => {
     setTimeout(() => {
@@ -91,7 +113,7 @@ function animateBFS(steps, setNodes, setEdges){
       if(step.type === 'visit-node'){
         setNodes(nodes =>
           nodes.map(
-            node => nodes.id === step.id
+            node => node.id === step.id
             ? {
               ...node,
               style: {
@@ -118,7 +140,6 @@ function animateBFS(steps, setNodes, setEdges){
     }, index* 500); //controls animation speed
   })
 }
-
 // Binary Tree Generator
 function binaryGen(maxDepth = 2, maxChildren = 2){
   const nodes = [];
@@ -182,7 +203,6 @@ function binaryGen(maxDepth = 2, maxChildren = 2){
   console.log(nodes, edges)
   return {nodes, edges}
 }
-
 function graphGen(nodeCount = 6) {
 
     const nodes = []
@@ -233,7 +253,6 @@ function graphGen(nodeCount = 6) {
 
 
 
-
 function App() {
 
   const onConnect = useCallback(
@@ -276,10 +295,26 @@ const onEdgesChange = useCallback(
 
           // Animate traversal
           animateBFS(steps, setNodes, setEdges);
-  }}
->
-  Start BFS
-</button>
+         }}
+         className='m-2'
+      >     
+           Start BFS
+      </button>
+
+      <button
+        type="button"
+        onClick={() => {
+          // Generate BFS steps from current graph
+          const steps = dfs(nodes, edges, nodes[0].id);
+          console.log(steps)
+
+          // Animate traversal
+          animateBFS(steps, setNodes, setEdges);
+         }}
+         className='m-2'
+      >     
+           Start DFS
+      </button>
 
        <ReactFlowProvider>
         <ReactFlow 
