@@ -47,13 +47,13 @@ function bfs(nodes, edges, startId){
   visited.add(startId)
 
   while(queue.length){
-    const current_node = queue.shift()  //deque the node
+    const current = queue.shift()  //deque the node
 
     //record node visit step
 
     steps.push({
       type: 'visit-node',
-      id: current_node,
+      id: current,
     })
 
     //visit neighbors
@@ -61,24 +61,30 @@ function bfs(nodes, edges, startId){
     for (const neighbor of neighbors){
       if(!visited.has(neighbor)){
         visited.add(neighbor);
+
+         //record edge traversal step
+      steps.push({
+        type: 'visit-edge',
+        from: current,
+        to: neighbor,
+      });
+
+        queue.push(neighbor)
       }
+
+       
     }
 
-    //record edge traversal step
-    steps.push({
-      type: 'visit-edge',
-      from: current,
-      to: neighbor,
-    });
+    
 
-    queue.push(neighbor)
+  
 
   }
   return steps
 }
 
 function animateBFS(steps, setNodes, setEdges){
-  steps.feorEach((step, index) => {
+  steps.forEach((step, index) => {
     setTimeout(() => {
 
       //Highlight visited nodes
@@ -90,7 +96,7 @@ function animateBFS(steps, setNodes, setEdges){
               ...node,
               style: {
                 ...node.style,
-                Background: '#22c55e',
+                background: '#22c55e',
               },
             } : node
           )
@@ -99,16 +105,12 @@ function animateBFS(steps, setNodes, setEdges){
 
       //highlight traversed edge
       if(step.type === 'visit-edge'){
-        setEdges(edges =>
-          edges.map(edges => edge.source === step.from && edge.target === step.to)
 
-          ? {
-            ...edge,
-            style: {
-              stroke: '#22c55e',
-              strokeWidth: 2,
-            },
-          } : edge
+        setEdges(edges =>
+          edges.map(edge => edge.source === step.from && edge.target === step.to
+            ? { ...edge, style: {stroke: '#22c55e', strokeWidth: 2,}} : edge
+          )
+          
         )
       }
 
@@ -235,15 +237,15 @@ function graphGen(nodeCount = 6) {
 function App() {
 
   const onConnect = useCallback(
-    (params) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot), [])
+    (params) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot) ), []
   )
 
   const onNodesChange = useCallback(
-  (changes) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot), [],)
+  (changes) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)), []
 );
 
 const onEdgesChange = useCallback(
-  (changes) => setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot), [])
+  (changes) => setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)), []
 );
 
   const [edges, setEdges] = useState([]);
@@ -256,7 +258,7 @@ const onEdgesChange = useCallback(
        <button 
        type='button' 
        onClick={() => {
-        const {nodes, edges } = graphGen();
+        const {nodes, edges } = binaryGen();
         // Update state
         setNodes(nodes)
         setEdges(edges)
@@ -270,6 +272,7 @@ const onEdgesChange = useCallback(
         onClick={() => {
           // Generate BFS steps from current graph
           const steps = bfs(nodes, edges, '0');
+          console.log(steps)
 
           // Animate traversal
           animateBFS(steps, setNodes, setEdges);
