@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { ReactFlow, Background, Controls,  ReactFlowProvider, applyEdgeChanges, applyNodeChanges } from '@xyflow/react';
+import { ReactFlow, Background, Controls,  ReactFlowProvider, applyEdgeChanges, applyNodeChanges, addEdge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 const initialNodes = [
@@ -26,6 +26,96 @@ const initialEdges = [
   },
 ];
 
+function bfs(nodes, edges, startId){
+
+  //This funcion runs BFS, but instead of just visiting nodes, it records every step so you can animate it later.
+  const visited = new Set();    //keep track of visited nodes
+  const steps = [];             //Animate steps
+  const adj = {};
+
+
+  //build adjeacency list
+  edges.forEach(edge => {
+    adj[edge.source] ??= [];
+    adj[edge.target] ??= [];
+
+    adj[edge.source].push(edge.target);
+    adj[edge.target].push(edge.source)
+  })
+
+  const queue = [startId]
+  visited.add(startId)
+
+  while(queue.length){
+    const current_node = queue.shift()  //deque the node
+
+    //record node visit step
+
+    steps.push({
+      type: 'visit-node',
+      id: current_node,
+    })
+
+    //visit neighbors
+    const neighbors =  adj[current]?.slice() || []
+    for (const neighbor of neighbors){
+      if(!visited.has(neighbor)){
+        visited.add(neighbor);
+      }
+    }
+
+    //record edge traversal step
+    steps.push({
+      type: 'visit-edge',
+      from: current,
+      to: neighbor,
+    });
+
+    queue.push(neighbor)
+
+  }
+  return steps
+}
+
+function animateBFS(steps, setNodes, setEdges){
+  steps.feorEach((step, index) => {
+    setTimeout(() => {
+
+      //Highlight visited nodes
+      if(step.type === 'visit-node'){
+        setNodes(nodes =>
+          nodes.map(
+            node => nodes.id === step.id
+            ? {
+              ...node,
+              style: {
+                ...node.style,
+                Background: '#22c55e',
+              },
+            } : node
+          )
+        )
+      }
+
+      //highlight traversed edge
+      if(step.type === 'visit-edge'){
+        setEdges(edges =>
+          edges.map(edges => edge.source === step.from && edge.target === step.to)
+
+          ? {
+            ...edge,
+            style: {
+              stroke: '#22c55e',
+              strokeWidth: 2,
+            },
+          } : edge
+        )
+      }
+
+
+    }, index* 500); //controls animation speed
+  })
+}
 
 // Binary Tree Generator
 function binaryGen(maxDepth = 2, maxChildren = 2){
@@ -91,7 +181,6 @@ function binaryGen(maxDepth = 2, maxChildren = 2){
   return {nodes, edges}
 }
 
-
 function graphGen(nodeCount = 6) {
 
     const nodes = []
@@ -107,15 +196,30 @@ function graphGen(nodeCount = 6) {
                 y: Math.random() * 400,
             },
             data: {label: `Node ${i}`},
+            style: {
+              Background: '#1f2937',
+              color: 'white',
+              borderRadius: '',
+              width: 60,
+              height: 40,
+            }
         });
     }
 
-    // Creat edges
+    // Creat Random edges
     for (let i = 0; i < nodeCount - 1; i++){
+``
+      const source = Math.floor(Math.random() * nodeCount);
+      let target = Math.floor(Math.random() * nodeCount)
+
+      //Prevents Self Loop
+      if (source === target) continue
+
         edges.push({
-            id: `e${i}-${i + 1}`,
-            source: `${i}`,
-            target: `${i + 1}`,
+            id: `e${source}-${target}-${i}`,
+            source: `${source}`,
+            target: `${target}`,
+            style: { stroke: '#64748b' },
         });
     
     }
@@ -129,6 +233,10 @@ function graphGen(nodeCount = 6) {
 
 
 function App() {
+
+  const onConnect = useCallback(
+    (params) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot), [])
+  )
 
   const onNodesChange = useCallback(
   (changes) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot), [],)
@@ -145,16 +253,30 @@ const onEdgesChange = useCallback(
     
      <div style={{ height: '100vh', width: '100vw' }} className='container'>
 
-       <button type='button' onClick={() => {
-        const {nodes, edges } = binaryGen();
-
+       <button 
+       type='button' 
+       onClick={() => {
+        const {nodes, edges } = graphGen();
         // Update state
         setNodes(nodes)
         setEdges(edges)
        }}
-       className='border border-1 p-2 rounded-3xl bg-blue-500'>
+       className='font-bold border border-1 p-2 rounded-xl bg-blue-500 m-5'>
         Generate Graph
       </button>
+
+      <button
+        type="button"
+        onClick={() => {
+          // Generate BFS steps from current graph
+          const steps = bfs(nodes, edges, '0');
+
+          // Animate traversal
+          animateBFS(steps, setNodes, setEdges);
+  }}
+>
+  Start BFS
+</button>
 
        <ReactFlowProvider>
         <ReactFlow 
@@ -162,6 +284,7 @@ const onEdgesChange = useCallback(
         edges={edges} 
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
         className='conatiner' 
         fitView>
             <Background />
