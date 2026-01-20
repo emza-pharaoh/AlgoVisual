@@ -3,18 +3,18 @@ import { ReactFlow, Background, Controls,  ReactFlowProvider, applyEdgeChanges, 
 import '@xyflow/react/dist/style.css';
 
 
-//Depth First Search Implementation
+//Depth First Search Implementation - FUNCTIONAL✅
 function dfs(nodes, edges, startId){
   const visited = new Set();
   const steps = [];
-  const adj = [];
+  const neighborList = [];
 
   edges.forEach(edge => {
-    adj[edge.source] ??= [];
-    adj[edge.target] ??= [];
+    neighborList[edge.source] ??= [];
+    neighborList[edge.target] ??= [];
 
-    adj[edge.source].push(edge.target);
-    adj[edge.target].push(edge.source);
+    neighborList[edge.source].push(edge.target);
+    neighborList[edge.target].push(edge.source);
   })
 
   
@@ -29,7 +29,7 @@ function dfs(nodes, edges, startId){
       id: node,
     });
 
-    for(const neighbor of adj[node] || []){
+    for(const neighbor of neighborList[node] || []){
       if(!visited.has(neighbor)){
         steps.push({
           type: 'visit-edge',
@@ -47,22 +47,22 @@ function dfs(nodes, edges, startId){
   dfsVisit(startId);
   return  steps;
 }
- //Breathd First Search Implementation
+ //Breathd First Search Implementation - FUNCTIONAL✅
 function bfs(nodes, edges, startId){
 
   //This funcion runs BFS, but instead of just visiting nodes, it records every step so you can animate it later.
   const visited = new Set();    //keep track of visited nodes
   const steps = [];             //Animate steps
-  const adj = {};
+  const neighborList = {};
 
 
-  //build adjeacency list
+  //build neighborListeacency list
   edges.forEach(edge => {
-    adj[edge.source] ??= [];
-    adj[edge.target] ??= [];
+    neighborList[edge.source] ??= [];
+    neighborList[edge.target] ??= [];
 
-    adj[edge.source].push(edge.target);
-    adj[edge.target].push(edge.source);
+    neighborList[edge.source].push(edge.target);
+    neighborList[edge.target].push(edge.source);
   })
 
   const queue = [startId]
@@ -79,7 +79,7 @@ function bfs(nodes, edges, startId){
     })
 
     //visit neighbors
-    const neighbors =  adj[current]?.slice() || []
+    const neighbors =  neighborList[current]?.slice() || []
     for (const neighbor of neighbors){
       if(!visited.has(neighbor)){
         visited.add(neighbor);
@@ -104,6 +104,79 @@ function bfs(nodes, edges, startId){
   }
   return steps
 }
+
+//dijkstras Algorithm Implementation
+function Dijkstra(nodes, edges, startId){
+  const steps = [];
+  const neighborList = buildNeighborList(edges);
+  const dist = {};
+  const visited = new Set();
+
+
+  nodes.forEach( node => {
+    dist[node.id] = Infinity
+  })
+  dist[startId] = 0;
+
+
+  //Build a list of neighbor relationships
+  edges.forEach( edge => {
+    const w = edge.data?.weight ?? 1;
+
+    neighborList[edge.source] ??= []
+    neighborList[edge.target] ??= []
+
+    neighborList[edge.source].push({ node: edge.target, weight: w})
+    neighborList[edge.target].push({ node: edge.source, weight: w})
+  });
+
+  //Priority Queue
+  const pq = [{ node: startId, dist: 0}];
+
+  while (pq.length){
+
+    pq.sort( (a, b) => a.dist - b.dist) //Sorting to simulate a min-heap                                     // 
+    const { node: current } = pq.shift() //popping the first element off the sorted array
+
+    if (visited.has(current)) continue;
+    visited.add(current);
+
+    //record visited node
+    steps.push({
+      type: 'visit-node',
+      id: current,
+      dist: dist[current],
+    });
+
+    for (const { node: neighbor, weight } of neighborList[current] || []){
+    if (visited.has(neighbor)) continue;
+
+    const newDist = dist[current] + weight
+
+    if(newDist < dist[neighbor]){
+      dist[neighbor] = newDist;
+
+      //record edge relaxation
+      steps.push({
+        type: 'relax-edge',
+        from: current,
+        to: neighbor,
+        weight,
+        newDist,
+      });
+
+      pq.push({ node: neighbor, dist: newDist })
+    }
+  }
+  }
+
+  
+
+  return steps
+}
+
+// ==================ANIMATION==============//
+
 //animated Breadth First Search
 function animateBFS(steps, setNodes, setEdges){
   steps.forEach((step, index) => {
@@ -140,7 +213,10 @@ function animateBFS(steps, setNodes, setEdges){
     }, index* 500); //controls animation speed
   })
 }
-// Binary Tree Generator
+
+
+// ==================Graog==ph Type Generators=====//
+// Binary Tree Generator 
 function binaryGen(maxDepth = 2, maxChildren = 2){
   const nodes = [];
   const edges = [];
@@ -164,6 +240,7 @@ function binaryGen(maxDepth = 2, maxChildren = 2){
         id: `e${parentId}-${id}`,
         source: parentId,
         target: id,
+        data: { weight: Math.floor(Math.random() * 9) + 1}
       })
     }
 
@@ -203,6 +280,7 @@ function binaryGen(maxDepth = 2, maxChildren = 2){
   console.log(nodes, edges)
   return {nodes, edges}
 }
+// Random Tree Generator 
 function graphGen(nodeCount = 6) {
 
     const nodes = []
@@ -250,6 +328,72 @@ function graphGen(nodeCount = 6) {
 
 }
 
+//Wieghted Graph Generator
+function weightedGraphGen(nodeCount = 6, extraEdgeChance = 0.4){
+ const nodes = [];
+ const edges = [];
+
+  for (let i = 0; i < nodeCount; i++){
+    nodes.push({
+      id: String(i), 
+      position: {
+        x: Math.random() * 400,
+        y: Math.random() * 400
+    },
+      data: {label: `Node ${i}`,
+      
+    }
+    })
+  }
+
+  for (let i = 0; i < nodeCount - 1; i++){
+    const weight = Math.floor(Math.random() * 9) + 1;
+
+    edges.push({
+      id: `e${i}-${i + 1}`,
+      source: String(i),
+      target: String(i + 1),
+      data: { weight },
+      style: { stroke: '#64748b' },
+    })
+  }
+
+  // 2️⃣ ADD RANDOM EXTRA EDGES
+  for (let i = 0; i < nodeCount; i++) {
+    for (let j = i + 2; j < nodeCount; j++) {
+      if (Math.random() < extraEdgeChance) {
+        const weight = Math.floor(Math.random() * 9) + 1;
+
+        edges.push({
+          id: `e${i}-${j}`,
+          source: String(i),
+          target: String(j),
+          data: { weight },
+          label: String(weight),
+          style: { stroke: '#64748b' },
+        });
+      }
+    }
+  }
+
+  return { nodes, edges }
+
+}
+
+//Neighborlist builder for Dijsktras Algorithm
+function buildNeighborList(edges){
+  const neighborList = {} 
+
+  for (const {source, target, weight} of edges){
+    if(!neighborList[source])  neighborList[source] = []
+    if(!neighborList[target]) neighborList[target] = []
+
+    neighborList[source].push({ node: target, weight })
+    neighborList[target].push({ node: source, weight})
+  }
+
+  return neighborList
+}
 
 
 
@@ -269,22 +413,62 @@ const onEdgesChange = useCallback(
 
   const [edges, setEdges] = useState([]);
   const [nodes, setNodes] = useState([]);
+  const [algorithm, setAlgorithm] = useState([]);
+  const [graphType, setGraphType] = useState('random');
+
   return (
 
     
-     <div style={{ height: '100vh', width: '100vw' }} className='container'>
+     <div style={{ height: '100vh', width: '100vw' }} className='m-2 my-2'>
 
-       <button 
-       type='button' 
-       onClick={() => {
-        const {nodes, edges } = binaryGen();
-        // Update state
-        setNodes(nodes)
-        setEdges(edges)
-       }}
-       className='font-bold border border-1 p-2 rounded-xl bg-blue-500 m-5'>
+      
+    
+     
+
+
+       <ReactFlowProvider>
+
+        <div className="flex flex-row justify-center shadow shadow-2xl relative h-100vh w-100vw absolute pointer-events-auto"
+        
+        >
+
+        <select value={graphType} onChange={(e) => setGraphType(e.target.value)}
+      className='m-2 shadow shadow-2xl animate hover:animate-bounce hover hover:duration-300 border border-cyan-800 shadow-green-800 py-5 px-7 rounded-2xl'
+        >
+        <option value="random">Random Graph</option>
+        <option value="binary">Binary Graph</option>
+        <option value="weighted">Weighted Graph</option>
+
+      </select>
+
+
+         <button type='button' 
+         
+         onClick={() => {
+        let result;
+
+        if(graphType === 'random'){
+          result = graphGen()
+        }
+        if(graphType === 'binary'){
+          result = binaryGen()
+        }
+        if(graphType === 'weighted'){
+          result = weightedGraphGen()
+        }
+        if (!result) return;+
+
+
+        setNodes(result.nodes);
+        setEdges(result.edges);
+
+        
+      }} 
+      className='m-2 shadow shadow-2xl animate hover:animate-bounce hover hover:duration-300 shadow-green-800 py-5 px-10 rounded-2xl'
+>
         Generate Graph
-      </button>
+        </button>
+       
 
       <button
         type="button"
@@ -296,7 +480,7 @@ const onEdgesChange = useCallback(
           // Animate traversal
           animateBFS(steps, setNodes, setEdges);
          }}
-         className='m-2'
+         className='m-2 shadow shadow-2xl shadow-gray-800 py-5 px-10 rounded-2xl'
       >     
            Start BFS
       </button>
@@ -311,22 +495,41 @@ const onEdgesChange = useCallback(
           // Animate traversal
           animateBFS(steps, setNodes, setEdges);
          }}
-         className='m-2'
+         className='m-2 shadow shadow-2xl shadow-gray-800 py-6 px-10 rounded-2xl'
       >     
            Start DFS
       </button>
 
-       <ReactFlowProvider>
+      <button
+        type="button"
+        onClick={() => {
+          // Generate BFS steps from current graph
+          const steps = Dijkstra(nodes, edges, nodes[0].id);
+          console.log(steps)
+
+          // Animate traversal
+          animateBFS(steps, setNodes, setEdges);
+         }}
+        className='m-2 shadow shadow-2xl shadow-gray-800 py-5 px-10 rounded-2xl'
+
+      >     
+          Dijkstra's Algorithm
+      </button>
+
+
+    </div>
         <ReactFlow 
         nodes={nodes} 
         edges={edges} 
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
-        className='conatiner' 
+        className='border border-gray-600 shadow shadow-2xl shadow-gray-900 z-1' 
         fitView>
             <Background />
           <Controls />
+
+      
       </ReactFlow>
 
        </ReactFlowProvider>
