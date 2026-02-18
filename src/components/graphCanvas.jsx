@@ -1,5 +1,13 @@
-export default function graphCanvas({nodes, edges, onNodesChange, onNodesChange, onConnect}) {
+import { ReactFlow, Background, Controls,  ReactFlowProvider, applyEdgeChanges, applyNodeChanges, addEdge } from '@xyflow/react';
+
+
+
+
+export default function GraphCanvas({nodes, edges, onNodesChange, onEdgesChange, onConnect}) {
+   
+   
     return(
+
          <ReactFlow 
         nodes={nodes} 
         edges={edges} 

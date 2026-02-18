@@ -18,31 +18,21 @@ import { animateTraversal } from '../animation/animateTraversal';
 
 
 import ControlPanel from './ControlPanel';
-
-
-
-
-
-
-///////// Handling Move Logic
-
-
-
-
+import GraphCanvas from './graphCanvas';
 
 
 
 export default function Home() {
 
-    const onConnect = useCallback(
-    (params) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot) ), []
-  )
+  const onConnect = useCallback(
+  (params) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot) ), []
+);
 
   const onNodesChange = useCallback(
   (changes) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)), []
 );
 
-const onEdgesChange = useCallback(
+  const onEdgesChange = useCallback(
   (changes) => setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)), []
 );
 
@@ -53,7 +43,7 @@ const onEdgesChange = useCallback(
 
 
 
-
+// Handle Graph Generating Logic
   const handleGenerate = () => {
   let result;
 
@@ -70,7 +60,7 @@ const onEdgesChange = useCallback(
 
 
 
-
+//Handle Algorithm Generation
   const handleBFS = () => {
     const steps = bfs(nodes, edges, nodes[0]?.id);
     animateTraversal(steps, setNodes, setEdges);
@@ -90,38 +80,33 @@ const onEdgesChange = useCallback(
   return (
 
     
-     <div style={{ height: '80vh', width: '100vw' }} className='m-2 my-2'>
+  <div style={{ height: '80vh', width: '100vw' }} className='m-2 my-2'>
 
-       <ReactFlowProvider>
+    
 
       
-        <ReactFlow 
-        nodes={nodes} 
-        edges={edges} 
+      <GraphCanvas
+        nodes={nodes}
+        edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
-        className='border border-gray-600 shadow shadow-2xl shadow-gray-900 z-1' 
-        fitView>
-            <Background />
-          <Controls />
-
-      </ReactFlow>
+  />
     
 
-       </ReactFlowProvider>
-         <div className="flex flex-row justify-center shadow shadow-2xl relative h-100vh w-100vw absolute pointer-events-auto"
+       
+  <div className="flex flex-row justify-center shadow shadow-2xl relative h-100vh w-100vw absolute pointer-events-auto"
         
         >
           
-        <ControlPanel
-        graphType={graphType}
-        setGraphType={setGraphType}
-        onGenerate={handleGenerate}
-        onBFS={handleBFS}
-        onDFS={handleDFS}
-        onDijkstra={handleDijkstra}
-      />
+      <ControlPanel
+          graphType={graphType}
+          setGraphType={setGraphType}
+          onGenerate={handleGenerate}
+          onBFS={handleBFS}
+          onDFS={handleDFS}
+          onDijkstra={handleDijkstra}
+    />
       
     </div>
 
