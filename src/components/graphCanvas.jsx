@@ -14,7 +14,7 @@ export default function GraphCanvas({nodes, edges, onNodesChange, onEdgesChange,
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
-        className='border border-gray-600 shadow shadow-2xl shadow-gray-900 z-1' 
+        className='border border-0 rounded-2xl shadow shadow-2xl shadow-gray-900 z-1' 
         fitView>
             <Background />
           <Controls />

@@ -2,10 +2,10 @@
 
 
 
-export default function ControlPanel({graphType, setGraphType, onGenerate, onBFS, onDFS, onDijkstra}) {
+export default function ControlPanel({graphType, setGraphType, algorithm, setAlgorithm, onGenerate, onRun, onBFS, onDFS, onDijkstra}) {
 
     return(
-         <div className="flex flex-wrap gap-2 p-2 justify-center">
+         <div className="flex flex-wrap gap-2 p-2 justify-center container">
       <select
         value={graphType}
         onChange={(e) => setGraphType(e.target.value)}
@@ -16,21 +16,25 @@ export default function ControlPanel({graphType, setGraphType, onGenerate, onBFS
         <option value="weighted">Weighted Graph</option>
       </select>
 
+
+       <select
+        value={algorithm}
+        onChange={(e) => setAlgorithm(e.target.value)}
+        className="rounded-xl p-3 shadow"
+      >
+        <option value="bfs">BFS</option>
+        <option value="dfs">DFS</option>
+        <option value="dijkstra">Dijkstra</option>
+      </select>
+
       <button onClick={onGenerate} className="m-2 shadow shadow-2xl shadow-gray-800 py-6 px-10 rounded-2xl">
         Generate
       </button>
 
-      <button onClick={onBFS} className="m-2 shadow shadow-2xl shadow-gray-800 py-6 px-10 rounded-2xl">
-        BFS
+      <button onClick={onRun} className="m-2 shadow shadow-2xl shadow-gray-800 py-6 px-10 rounded-2xl">
+        Run
       </button>
 
-      <button onClick={onDFS} className="m-2 shadow shadow-2xl shadow-gray-800 py-6 px-10 rounded-2xl">
-        DFS
-      </button>
-
-      <button onClick={onDijkstra} className="m-2 shadow shadow-2xl shadow-gray-800 py-6 px-10 rounded-2xl">
-        Dijkstra
-      </button>
     </div>
     )
 }

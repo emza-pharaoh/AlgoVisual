@@ -24,17 +24,25 @@ export function weightedGraphGen(rows = 4, columns = 4){
     source: a.toString(),
     target: b.toString(),
     label: weight.toString(),
+    type: "straight",
     data: { weight }
 
   });
  }
 
  for(let i = 0; i < nodes.length; i++){
+
   const row = Math.floor(i/ columns);
   const col = i % columns;
 
   if(col < columns - 1)addEdge(i, i + 1);
-  if (row < row - 1)addEdge(i, i + columns)
+
+  if(col > 0) addEdge(i, i - 1)
+
+
+  if (row < rows - 1)addEdge(i, i + columns)
+
+  if(row > 0) addEdge(i, i - columns)
  }
 
  edges.forEach(e => {
