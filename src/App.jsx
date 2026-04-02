@@ -1,13 +1,16 @@
 import Home from './components/Home';
+import LandingPage from './components/LandingPage';
+import { Routes, Route } from 'react-router-dom';
 import '@xyflow/react/dist/style.css';
 
 
 function App() {
 
   return(
-    <>
-    <Home />
-    </>
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/home" element={<Home />} />
+    </Routes>
   )
 }
 

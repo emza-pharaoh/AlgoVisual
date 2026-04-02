@@ -80,21 +80,21 @@ const handleAlgorithm = () => {
   return (
 
     
-<div className=' min-h-screen flex flex-col bg-gray-100'>
+<div className="min-h-screen flex flex-col bg-[url('/algoVbg.png')]  p-1">
 
 {/* NAVBAR Desktop Only */}
-    <div className=" lg:block shadow shadow-2xl h-10 bg-[#6A89A7] ">
+    <div className=" lg:block shadow shadow-2xl h-10 bg-[#6A89A7] m-auto rounded-2xl w-full max-w-7xl">
       <Navbar/>
     </div>
 
      {/* desription Panel */}
-    <div className="mt-3 border border-0 shadow-2xl rounded-2xl ">
+    <div className="mt-3 border border-0 shadow-2xl rounded-2xl bg-black/10 backdrop-blur-sm p-4 max-w-7xl w-full m-auto">
       <DescriptionPanel selectedAgo={algorithm}/>
     </div>
 
 
 {/* Main Content */}
-<main className='flex-1  lg:p-8 max-w,7xl w-full m-1 bg-gradient-to-br from-soft via-[#6A89A7] to-dark'>
+<main className='flex-1  lg:p-8 max-w,7xl w-full m-1 bg-gradient-to-br from-soft via-[#530079] to-dark'>
  
 
 {/* Workspace */}
@@ -102,7 +102,7 @@ const handleAlgorithm = () => {
                         lg:grid-cols-3
                         gap-6'>
 
-    <div className="lg:col-span-2 min-h-100 border border-0">
+    <div className="lg:col-span-2 min-h-100 border border-0 bg-[#384959] rounded-2xl shadow-2xl">
     
       <GraphCanvas
       nodes={nodes}
