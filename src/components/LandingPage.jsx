@@ -1,9 +1,15 @@
 import { useNavigate } from 'react-router-dom';
 
 
+
 export default function Landing() {
     const navigate = useNavigate();
   return (
+
+   
+
+
+
     <div className="bg-blue-300 min-h-screen bg-animated flex flex-col bg-[url('/algoVbg.png')] bg-cover bg-center">
 
       {/* NAVBAR */}
@@ -68,5 +74,6 @@ z
       </div>
 
     </div>
+      
   );
 }

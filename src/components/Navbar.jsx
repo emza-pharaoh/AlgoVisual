@@ -1,4 +1,10 @@
+import { useNavigate } from "react-router-dom"
+
+
 export default function Navbar() {
+
+ const navigate = useNavigate();
+
     return(
         <>
         <nav class=" bg-[#962ca0] after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-white/10 bg-black/50 backdrop-blur-sm shadow-lg rounded-2xl">
@@ -23,7 +29,7 @@ export default function Navbar() {
         <div class="hidden sm:ml-6 sm:block">
           <div class="flex space-x-4">
            
-            <a href="#" aria-current="page" class="rounded-md bg-gray-950/50 px-3 py-2 text-sm font-medium text-white">Home</a>
+            <a href="#" aria-current="page" class="rounded-md bg-gray-950/50 px-3 py-2 text-sm font-medium text-white " onClick={() => navigate('/')}>Home</a>
             <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-white">About</a>
           
           </div>

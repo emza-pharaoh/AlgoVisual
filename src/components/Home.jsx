@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { ReactFlow, Background, Controls,  ReactFlowProvider, applyEdgeChanges, applyNodeChanges, addEdge } from '@xyflow/react';
-
+import { motion } from 'framer-motion';
 // Algorithms Duh!
 import { bfs } from '../algorithms/BFS';
 import { dfs } from '../algorithms/DFS';
@@ -79,16 +79,18 @@ const handleAlgorithm = () => {
 
   return (
 
-    
-<div className="min-h-screen flex flex-col bg-[url('/algoVbg.png')]  p-1">
+
+
+
+<div className="min-h-screen flex flex-col bg-[url('/algoVbg.png')] p-1 flex-1 bg-cover bg-center gap-3 justify-center items-center">
 
 {/* NAVBAR Desktop Only */}
-    <div className=" lg:block shadow shadow-2xl h-10 bg-[#6A89A7] m-auto rounded-2xl w-full max-w-7xl">
+    <div className=" lg:block shadow shadow-2xl h-10 bg-[#6A89A7] rounded-2xl  w-full">
       <Navbar/>
     </div>
 
      {/* desription Panel */}
-    <div className="mt-3 border border-0 shadow-2xl rounded-2xl bg-black/10 backdrop-blur-sm p-4 max-w-7xl w-full m-auto">
+    <div className="mt-5 border border-0 shadow-2xl rounded-2xl bg-black/10 backdrop-blur-sm w-full p-2 ">
       <DescriptionPanel selectedAgo={algorithm}/>
     </div>
 
@@ -102,7 +104,7 @@ const handleAlgorithm = () => {
                         lg:grid-cols-3
                         gap-6'>
 
-    <div className="lg:col-span-2 min-h-100 border border-0 bg-[#384959] rounded-2xl shadow-2xl">
+    <div className="lg:col-span-2 min-h-100 border border-0 bg-black/10 backdrop-blur-sm rounded-2xl shadow-2xl">
     
       <GraphCanvas
       nodes={nodes}
@@ -118,7 +120,7 @@ const handleAlgorithm = () => {
     </div>
 
     </section>
-    <div className='m-5'>
+    <div className='m-5 border border-0 rounded-2xl shadow-2xl p-3 bg-transparent backdrop-blur-lg'>
 
       <ControlPanel
         graphType={graphType}
@@ -139,6 +141,7 @@ const handleAlgorithm = () => {
 
 
     </div>
+    
   )
 
 }
